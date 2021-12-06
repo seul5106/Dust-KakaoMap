@@ -55,7 +55,7 @@
 
 
         // 값을 받아오는 함수
-        const air_call = (todayString) => {
+        const air_call = () => {
             const xhr = new XMLHttpRequest(); //Ajax의 기능을 수행하는 통신 "객체"
             const method = "GET"; // 백엔드에 접속하는 방식(GET, POST, PUT, DELETE)
             const url = "http://openapi.seoul.go.kr:8088/4768664573676f6f38366a58517357/json/DailyAverageAirQuality/1/20/" + todayString; //접속할 위치            
@@ -72,18 +72,19 @@
                     if (target.status == 200) {
 
                         air_data = JSON.parse(target.response);
+                        console.log(air_data);
+
                         air_data_row = air_data.DailyAverageAirQuality.row;
                         console.log(air_data_row);
-                        air_data_row.map((v,i) => {
-                            console.log(v.MSRSTE_NM);
-                            if(v.MSRSTE_NM == targets){
-                                console.log(v.PM10, v.MSRSTE_NM);
+
+                        air_data_row.map((v, i) => {
+                            if (v.MSRSTE_NM == targets) {
+                                air_data_row_1 = [];
                                 air_data_row_1.push(v.PM10, v.PM25)
                                 console.log(air_data_row_1);
-                                showChart(v.PM10,v.MSRSTE_NM);
+                                showChart(air_data_row_1,v.MSRSTE_NM, v.MSRSTE_NM);
                             }
-                        })
-                        
+                        });
                     } else {    //서버와 연결이 안됐을 경우
                         // s = target.status 와 100을 나눈 몫을 정수화
                         const s = parseInt(target.status / 100);
@@ -110,23 +111,45 @@
 
 
         // 차트js
-        const showChart = (pm10, labels) => {
+        const showChart = (data,label,labels) => {
             let ctx = document.getElementById('myChart').getContext('2d');
-            console.log(pm10);
+
+
+            
             let myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels:
-                        labels,
+                        label,
                     datasets: [{
                         label: labels,
                         backgroundColor: 'rgb(255, 99, 132)',
                         borderColor: 'rgb(255, 99, 132)',
-                        data: air_data_row_1
+                        data: data
                     }]
                 }
             });
+
+            addData(showChart,label, air_data_row_1);
         };
+
+        function addData(chart, label, data) {
+            chart.data.labels.push(label);
+            chart.data.datasets.forEach((dataset) => {
+                dataset.data.push(data);
+            });
+            chart.update();
+        }
+
+
+        // const update = () => {
+        //     datasets: [{
+        //                 label: labels,
+        //                 backgroundColor: 'rgb(255, 99, 132)',
+        //                 borderColor: 'rgb(255, 99, 132)',
+        //                 data: air_data_row_1
+        //             }]
+        // }
 
 
         document.querySelector("#select").addEventListener("change", e => {
@@ -134,13 +157,11 @@
 
             const target = e.currentTarget;
             console.log(target);
+
             targets = target.value;
             console.log(targets);
-            air_call(todayString);
+            air_call();
         });
-
-
-        air_call(todayString);
     </script>
 </body>
 
