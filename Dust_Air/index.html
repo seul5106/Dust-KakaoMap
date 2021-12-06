@@ -9,27 +9,57 @@
 </head>
 
 <body>
-    <select>
+    <select id="select">
+        <option value="">선택하세요</option>
+        <option value="강남구">강남구</option>
+        <option value="강남대로">강남대로</option>
+        <option value="강동구">강동구</option>
         <option value="강변북로">강변북로</option>
+        <option value="강북구">강북구</option>
+        <option value="공항대로">공항대로</option>
+        <option value="관악구">관악구</option>
+        <option value="관악산">관악산</option>
+        <option value="광진구">광진구</option>
+        <option value="구로구">구로구</option>
     </select>
 
     <div>
         <canvas id="myChart"></canvas>
     </div>
-    
+
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         let air_data = null; //air_data 의 json 데이터 전체
-        let air_data_get = null; 
+        let targets = null; //change이벤트의 값
+        let air_data_row = null;
+        let air_data_row_1 = [];
+
+
+        // 날짜를 출력
+        let today = new Date();
+        let year = today.getFullYear();
+        let month = today.getMonth() + 1;
+        let date = today.getDate();
+        let todayString = "";
+
+        if (date < 10) {
+            todayString = "" + year + month + "0" + date;
+        } else {
+            todayString = "" + year + month + date;
+        }
+        console.log(todayString);
 
 
 
-        const air_call = () => {
+
+
+        // 값을 받아오는 함수
+        const air_call = (todayString) => {
             const xhr = new XMLHttpRequest(); //Ajax의 기능을 수행하는 통신 "객체"
             const method = "GET"; // 백엔드에 접속하는 방식(GET, POST, PUT, DELETE)
-            const url = "http://openapi.seoul.go.kr:8088/4768664573676f6f38366a58517357/json/DailyAverageAirQuality/1/20/20211130"; //접속할 위치            
-
+            const url = "http://openapi.seoul.go.kr:8088/4768664573676f6f38366a58517357/json/DailyAverageAirQuality/1/20/" + todayString; //접속할 위치            
+            console.log(url);
 
             xhr.onreadystatechange = e => { //Ajax 통신객체를 받은 객체 xhr이 readyState객체의 프로퍼티 값이 변할때 마다 호출
                 const { target } = e; //구조분해 문법 -> e라는 객체에 target을 불러옴
@@ -42,10 +72,18 @@
                     if (target.status == 200) {
 
                         air_data = JSON.parse(target.response);
-                        air_data.DailyAverageAirQuality.row.map((v,i) => {
-                            air_data_get = v;
-                        });
-                        console.log(air_data_get);
+                        air_data_row = air_data.DailyAverageAirQuality.row;
+                        console.log(air_data_row);
+                        air_data_row.map((v,i) => {
+                            console.log(v.MSRSTE_NM);
+                            if(v.MSRSTE_NM == targets){
+                                console.log(v.PM10, v.MSRSTE_NM);
+                                air_data_row_1.push(v.PM10, v.PM25)
+                                console.log(air_data_row_1);
+                                showChart(v.PM10,v.MSRSTE_NM);
+                            }
+                        })
+                        
                     } else {    //서버와 연결이 안됐을 경우
                         // s = target.status 와 100을 나눈 몫을 정수화
                         const s = parseInt(target.status / 100);
@@ -65,30 +103,44 @@
                 }
             }
             xhr.open(method, url);
-
             // xhr객체가 요청을 백엔드에 전송
             xhr.send();
         };
 
+
+
         // 차트js
-        const showChart = (data, labels) => {
+        const showChart = (pm10, labels) => {
             let ctx = document.getElementById('myChart').getContext('2d');
+            console.log(pm10);
             let myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels:
                         labels,
                     datasets: [{
-                        label: '일간순위별 관객수',
+                        label: labels,
                         backgroundColor: 'rgb(255, 99, 132)',
                         borderColor: 'rgb(255, 99, 132)',
-                        data: data
+                        data: air_data_row_1
                     }]
                 }
             });
-            myChart.update();
-        }
-        air_call();
+        };
+
+
+        document.querySelector("#select").addEventListener("change", e => {
+            console.log(e);
+
+            const target = e.currentTarget;
+            console.log(target);
+            targets = target.value;
+            console.log(targets);
+            air_call(todayString);
+        });
+
+
+        air_call(todayString);
     </script>
 </body>
 
