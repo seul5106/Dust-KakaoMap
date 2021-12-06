@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>미세먼지 데이터</h1>
+
+    <label for="area-select">Choose a area:</label>
+
+    <select id="area-select">
+        <option value="">--Please choose an option--</option>
+    </select>
+
+    <script>
+        // 날짜 불러오는 거
+        let today = new Date();
+
+        let year = today.getFullYear();
+        let month = today.getMonth() + 1;
+        let date = today.getDate();
+
+        let todayString = "";
+
+        if (date < 10) {
+            todayString = "" + year + month + "0" + date;
+        } else {
+            todayString = "" + year + month + date;
+        }
+        console.log(todayString);
+        let seoulData = "";
+
+        (() => {
+            const xhr = new XMLHttpRequest();
+            const method = "GET";
+            const url = "http://openapi.seoul.go.kr:8088/4768664573676f6f38366a58517357/json/DailyAverageAirQuality/1/30/" + todayString;
+
+            xhr.onreadystatechange = (e) => {
+                const {
+                    target
+                } = e;
+
+                if (target.readyState == XMLHttpRequest.DONE) {
+                    if (target.status == 200) {
+                        const req = JSON.parse(target.response);
+                        const areaSelect = document.querySelector("#area-select");
+
+                        req.DailyAverageAirQuality.row.map((v, i) => {
+                            const option = document.createElement("option");
+                            let optionValue = v.MSRSTE_NM;
+                            option.setAttribute('value', optionValue);
+                            option.innerHTML = v.MSRSTE_NM;
+                            areaSelect.appendChild(option);
+                        });
+                        seoulData = req.DailyAverageAirQuality;
+                    } else {
+                        const s = parseInt(target.status / 100);
+                        let errMsg = null;
+
+                        if (s == 4) {
+                            errMsg = "[" + target.status + "]" + target.statusText + "- 요청 주소가 잘못되었습니다.";
+                        } else if (s == 5) {
+                            errMsg = "[" + target.status + "]" + target.statusText + "- 서버의 응답이 없습니다.";
+                        } else {
+                            errMsg = "[" + target.status + "]" + target.statusText + "- 요청에 실패했습니다.";
+                        }
+                        alert(errMsg);
+                    }
+                }
+            };
+            xhr.open(method, url);
+            xhr.send();
+        })();
+
+        document.querySelector("#area-select").addEventListener("change", e => {
+
+            let target = document.getElementById("area-select");
+            let select = target.options[target.selectedIndex].value;
+            console.log(seoulData.row);
+            seoulData.row.map((v, i) => {
+                if (seoulData.row[i].MSRSTE_NM == select) {
+                    seoulData.row[i].CO
+                    seoulData.row[i].PM10
+                    seoulData.row[i].PM25
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
