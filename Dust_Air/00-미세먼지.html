@@ -20,7 +20,7 @@
         <option value="">--Please choose an option--</option>
     </select>
 
-    <div class="chart-container" style="position: relative; height:200px; width:60vw">
+    <div class="chart-container" style="position: relative; height:600px; width:60vw">
         <canvas id="myChart"></canvas>
     </div>
 
@@ -33,26 +33,26 @@
             type: 'bar',
             data: {
                 labels: [ // Date Objects
-                    'data1'
+                    ''
                 ],
                 datasets: [{
-                //     label: 'My First dataset',
-                //     backgroundColor: 'rgba(75, 192, 192, 1)',
-                //     borderColor: 'rgba(75, 192, 192, 1)',
-                //     fill: false,
-                //     data: [
-                //         0
-                //     ],
-                // }, {
-                    label: 'My Second dataset',
-                    backgroundColor: 'rgba(255, 99, 132, 1)',
+                    //     label: 'My First dataset',
+                    //     backgroundColor: 'rgba(75, 192, 192, 1)',
+                    //     borderColor: 'rgba(75, 192, 192, 1)',
+                    //     fill: false,
+                    //     data: [
+                    //         0
+                    //     ],
+                    // }, {
+                    label: [''],
+                    backgroundColor: 'rgba(75, 192, 192, 1)',
                     borderColor: 'rgba(255, 99, 132, 1)',
                     fill: false,
                     data: [
                         1
                     ],
-                },{
-                    label: 'My Second dataset',
+                }, {
+                    label: [''],
                     backgroundColor: 'rgba(255, 99, 132, 1)',
                     borderColor: 'rgba(255, 99, 132, 1)',
                     fill: false,
@@ -60,17 +60,23 @@
                         2
                     ],
                 }
-            ]},
+                ]
+            },
             options: {
                 maintainAspectRatio: false,
                 title: {
                     text: 'Chart.js Time Scale'
                 },
                 scales: {
+                    y: {
+
+                    },
                     yAxes: [{
                         scaleLabel: {
                             display: true,
-                            labelString: '차트'
+                            labelString: '차트',
+                            min: 0,
+                            max: 100,
                         }
                     }]
                 },
@@ -152,13 +158,17 @@
             console.log(select);
 
             var dataset = config.data.datasets;
-
+            let label = config.data.labels;
+            console.log(label);
 
             seoulData.map((v, i) => {
                 if (seoulData[i].MSRSTE_NM == select) {
-                    // dataset[0].data[0]=seoulData[i].CO;
-                    dataset[0].data[0]=seoulData[i].PM10
-                    dataset[1].data[0]=seoulData[i].PM25
+                    console.log(seoulData[i].MSRSTE_NM);
+                    label[0] = String(seoulData[i].MSRSTE_NM);
+                    dataset[0].label[0] = "미세먼지"
+                    dataset[1].label[0] = "초미세먼지"
+                    dataset[0].data[0] = seoulData[i].PM10
+                    dataset[1].data[0] = seoulData[i].PM25
 
                     console.log(seoulData[i].CO);
 
