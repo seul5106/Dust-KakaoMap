@@ -52,8 +52,16 @@
                     data: [
                         arr[0]
                     ],
-                }]
-            },
+                },{
+                    label: 'My Second dataset',
+                    backgroundColor: 'rgba(255, 99, 132, 1)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    fill: false,
+                    data: [
+                        arr[0]
+                    ],
+                }
+            ]},
             options: {
                 maintainAspectRatio: false,
                 title: {
@@ -150,7 +158,7 @@
                 if (seoulData[i].MSRSTE_NM == select) {
                     dataset[0].data[0]=seoulData[i].CO;
                     dataset[1].data[0]=seoulData[i].PM10
-                    seoulData[i].PM25
+                    dataset[2].data[0]=seoulData[i].PM25
 
                     console.log(seoulData[i].CO);
 
