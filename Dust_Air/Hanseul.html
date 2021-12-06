@@ -57,7 +57,7 @@
                             option.innerHTML = v.MSRSTE_NM;
                             areaSelect.appendChild(option);
                         });
-                        seoulData = req.DailyAverageAirQuality;
+                        seoulData = req.DailyAverageAirQuality.row;
                     } else {
                         const s = parseInt(target.status / 100);
                         let errMsg = null;
@@ -81,12 +81,12 @@
 
             let target = document.getElementById("area-select");
             let select = target.options[target.selectedIndex].value;
-            console.log(seoulData.row);
-            seoulData.row.map((v, i) => {
-                if (seoulData.row[i].MSRSTE_NM == select) {
-                    seoulData.row[i].CO
-                    seoulData.row[i].PM10
-                    seoulData.row[i].PM25
+            console.log(select);
+            seoulData.map((v, i) => {
+                if (seoulData[i].MSRSTE_NM == select) {
+                    console.log(seoulData[i].CO);
+                    seoulData[i].PM10
+                    seoulData[i].PM25
                 }
             });
         });
