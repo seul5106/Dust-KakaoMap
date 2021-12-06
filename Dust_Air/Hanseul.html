@@ -82,6 +82,8 @@
             let target = document.getElementById("area-select");
             let select = target.options[target.selectedIndex].value;
             console.log(select);
+
+
             seoulData.map((v, i) => {
                 if (seoulData[i].MSRSTE_NM == select) {
                     console.log(seoulData[i].CO);
