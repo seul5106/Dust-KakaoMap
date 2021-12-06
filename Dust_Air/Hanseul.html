@@ -27,10 +27,15 @@
 
         let todayString = "";
 
-        if (date < 10) {
-            todayString = "" + year + month + "0" + date;
+        if (month < 10) {
+            todayString = "" + year + "0" + month;
         } else {
-            todayString = "" + year + month + date;
+            todayString = "" + year + month;
+        }
+        if (date < 10) {
+            todayString +=  "0" + date;
+        } else {
+            todayString += date;
         }
         console.log(todayString);
         let seoulData = "";
