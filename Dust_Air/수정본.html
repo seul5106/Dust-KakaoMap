@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+    <style>
+        .chart-container {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>미세먼지 데이터</h1>
+
+    <label for="area-select">Choose a area:</label>
+
+    <select id="area-select">
+        <option value="">--Please choose an option--</option>
+    </select>
+
+    <div class="chart-container" style="position: relative; height:200px; width:60vw">
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <script>
+        // 차트 바꾸기
+        var ctx = document.getElementById('myChart');
+
+
+        var config = {
+            type: 'bar',
+            data: {
+                labels: [ // Date Objects
+                    'data1'
+                ],
+                datasets: [{
+                    //     label: 'My First dataset',
+                    //     backgroundColor: 'rgba(75, 192, 192, 1)',
+                    //     borderColor: 'rgba(75, 192, 192, 1)',
+                    //     fill: false,
+                    //     data: [
+                    //         0
+                    //     ],
+                    // }, {
+                    label: 'My Second dataset',
+                    backgroundColor: 'rgba(255, 99, 132, 1)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    fill: false,
+                    data: [
+                        1
+                    ],
+                }, {
+                    label: 'My Second dataset',
+                    backgroundColor: 'rgba(255, 99, 132, 1)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    fill: false,
+                    data: [
+                        2
+                    ],
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                title: {
+                    text: 'Chart.js Time Scale'
+                },
+                scales: {
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: '차트'
+                        }
+                    }]
+                },
+            }
+        };
+
+        //차트 그리기
+        var myChart = new Chart(ctx, config);
+
+
+        // 날짜 불러오는 거
+        let today = new Date();
+
+        let year = today.getFullYear();
+        let month = today.getMonth() + 1;
+        let date = today.getDate();
+
+        let todayString = "";
+
+        if (month < 10) {
+            todayString = "" + year + "0" + month;
+        } else {
+            todayString = "" + year + month;
+        }
+        if (date < 10) {
+            todayString += "0" + date;
+        } else {
+            todayString += date;
+        }
+        console.log(todayString);
+        let seoulData = "";
+
+        (() => {
+            const xhr = new XMLHttpRequest();
+            const method = "GET";
+            const url = "http://openapi.seoul.go.kr:8088/4768664573676f6f38366a58517357/json/DailyAverageAirQuality/1/30/" + todayString;
+
+            xhr.onreadystatechange = (e) => {
+                const {
+                    target
+                } = e;
+
+                if (target.readyState == XMLHttpRequest.DONE) {
+                    if (target.status == 200) {
+                        const req = JSON.parse(target.response);
+                        const areaSelect = document.querySelector("#area-select");
+
+                        req.DailyAverageAirQuality.row.map((v, i) => {
+                            const option = document.createElement("option");
+                            let optionValue = v.MSRSTE_NM;
+                            option.setAttribute('value', optionValue);
+                            option.innerHTML = v.MSRSTE_NM;
+                            areaSelect.appendChild(option);
+                        });
+                        seoulData = req.DailyAverageAirQuality.row;
+                    } else {
+                        const s = parseInt(target.status / 100);
+                        let errMsg = null;
+
+                        if (s == 4) {
+                            errMsg = "[" + target.status + "]" + target.statusText + "- 요청 주소가 잘못되었습니다.";
+                        } else if (s == 5) {
+                            errMsg = "[" + target.status + "]" + target.statusText + "- 서버의 응답이 없습니다.";
+                        } else {
+                            errMsg = "[" + target.status + "]" + target.statusText + "- 요청에 실패했습니다.";
+                        }
+                        alert(errMsg);
+                    }
+                }
+            };
+            xhr.open(method, url);
+            xhr.send();
+        })();
+
+        document.querySelector("#area-select").addEventListener("change", e => {
+
+            let target = document.getElementById("area-select");
+            let select = target.options[target.selectedIndex].value;
+            console.log(select);
+            let chartDisplay = document.querySelector(".chart-container")
+            var dataset = config.data.datasets;
+
+            if (select != "") {
+                chartDisplay.style.display = 'block';
+            } else {
+                console.log("123123123")
+                chartDisplay.style.display = 'none';
+            }
+
+            seoulData.map((v, i) => {
+                if (seoulData[i].MSRSTE_NM == select) {
+                    // dataset[0].data[0]=seoulData[i].CO;
+                    dataset[0].data[0] = seoulData[i].PM10
+                    dataset[1].data[0] = seoulData[i].PM25
+
+                    console.log(seoulData[i].CO);
+
+                    myChart.update();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
