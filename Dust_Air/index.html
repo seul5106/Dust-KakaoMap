@@ -9,16 +9,87 @@
 </head>
 
 <body>
-    <section>
+    <select>
+        <option value="강변북로">강변북로</option>
+    </select>
 
-    </section>
-
-
-
+    <div>
+        <canvas id="myChart"></canvas>
+    </div>
+    
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let air_data = null; //air_data 의 json 데이터 전체
+        let air_data_get = null; 
 
 
+
+        const air_call = () => {
+            const xhr = new XMLHttpRequest(); //Ajax의 기능을 수행하는 통신 "객체"
+            const method = "GET"; // 백엔드에 접속하는 방식(GET, POST, PUT, DELETE)
+            const url = "http://openapi.seoul.go.kr:8088/4768664573676f6f38366a58517357/json/DailyAverageAirQuality/1/20/20211130"; //접속할 위치            
+
+
+            xhr.onreadystatechange = e => { //Ajax 통신객체를 받은 객체 xhr이 readyState객체의 프로퍼티 값이 변할때 마다 호출
+                const { target } = e; //구조분해 문법 -> e라는 객체에 target을 불러옴
+                console.log(target); //XMLHttpRequest 객체의 값을 불러옴
+
+                // target.readyState값이 XMLHttpRequest.DONE과 같다면
+                // target.readyState값이 XMLHttpRequest.DONE과 같다면
+                if (target.readyState == XMLHttpRequest.DONE) {
+                    // target.statusText값이 "OK"라면
+                    if (target.status == 200) {
+
+                        air_data = JSON.parse(target.response);
+                        air_data.DailyAverageAirQuality.row.map((v,i) => {
+                            air_data_get = v;
+                        });
+                        console.log(air_data_get);
+                    } else {    //서버와 연결이 안됐을 경우
+                        // s = target.status 와 100을 나눈 몫을 정수화
+                        const s = parseInt(target.status / 100);
+                        // 알림메세지가 담길 변수 errMsg
+                        let errMsg = "null"
+                        // s 가 4로 나누어 진다면
+                        if (s == 4) {
+                            errMsg = `[${target.status}]${target.statusText}- 요청 주소가 잘못되었습니다.`;
+                        } else if (s == 5) {
+                            errMsg = `[${target.status}]${target.statusText}- 서버의 응답이 없습니다.`;
+                        } else {
+                            errMsg = `[${target.status}]${target.statusText}- 요청에 실패했습니다.`;
+                        }
+                        // 알림메세지 출력
+                        alert(errMsg);
+                    }
+                }
+            }
+            xhr.open(method, url);
+
+            // xhr객체가 요청을 백엔드에 전송
+            xhr.send();
+        };
+
+        // 차트js
+        const showChart = (data, labels) => {
+            let ctx = document.getElementById('myChart').getContext('2d');
+            let myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels:
+                        labels,
+                    datasets: [{
+                        label: '일간순위별 관객수',
+                        backgroundColor: 'rgb(255, 99, 132)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        data: data
+                    }]
+                }
+            });
+            myChart.update();
+        }
+        air_call();
+    </script>
 </body>
 
 </html>
