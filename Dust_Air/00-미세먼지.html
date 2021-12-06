@@ -6,9 +6,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script type="text/javascript"
-        src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+    <style>
+        .chart-container {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
@@ -59,18 +63,21 @@
                     data: [
                         2
                     ],
-                }
-                ]
+                }]
             },
             options: {
+                legend: {
+                    labels: {
+                        fontColor: "#000",
+                        fontSize: 18
+                    }
+                },
                 maintainAspectRatio: false,
                 title: {
                     text: 'Chart.js Time Scale'
                 },
                 scales: {
-                    y: {
 
-                    },
                     yAxes: [{
                         ticks: {
                             beginAtZero: true,
@@ -78,7 +85,7 @@
                         },
                         scaleLabel: {
                             display: true,
-                            labelString: '차트',
+                            labelString: '',
                             min: 0,
                             max: 100,
                         }
@@ -160,10 +167,17 @@
             let target = document.getElementById("area-select");
             let select = target.options[target.selectedIndex].value;
             console.log(select);
-
+            let chartDisplay = document.querySelector(".chart-container")
             var dataset = config.data.datasets;
             let label = config.data.labels;
             console.log(label);
+
+            if (select != "") {
+                chartDisplay.style.display = 'block';
+            } else {
+                console.log("123123123")
+                chartDisplay.style.display = 'none';
+            }
 
             seoulData.map((v, i) => {
                 if (seoulData[i].MSRSTE_NM == select) {
